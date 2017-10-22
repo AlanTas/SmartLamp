@@ -17,16 +17,6 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -36,8 +26,8 @@ public class MainActivity extends AppCompatActivity {
     ColorPickerView pickerView;
     TextView textView;
 
-    static String MQTTHOST = "tcp://192.168.0.4:1883";
-    MqttAndroidClient client;
+    AjudanteMqtt ajudanteMqtt;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,37 +38,8 @@ public class MainActivity extends AppCompatActivity {
         pickerView = (ColorPickerView) findViewById(R.id.color_picker_view);
         textView = (TextView) findViewById(R.id.textView);
 
-
-        String clientId = MqttClient.generateClientId();
-        client =
-                new MqttAndroidClient(this.getApplicationContext(), MQTTHOST, clientId);
-
-
-        try {
-            IMqttToken token = client.connect();
-            token.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    // We are connected
-                   Toast toas = Toast.makeText(getApplicationContext(), "Conectado", Toast.LENGTH_SHORT);
-                    toas.show();;
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    // Something went wrong e.g. connection timeout or firewall problems
-                    Toast toas = Toast.makeText(getApplicationContext(), "Falha", Toast.LENGTH_SHORT);
-                    toas.show();;
-
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-
-
-
-
+        ajudanteMqtt = new AjudanteMqtt(getApplicationContext());
+        ajudanteMqtt.connect();
 
         pickerView.addOnColorSelectedListener((new OnColorSelectedListener() {
             @Override
@@ -93,25 +54,14 @@ public class MainActivity extends AppCompatActivity {
 
                 textView.setText(color);
 
-                String mensagem = "#r=" + Integer.toString(red) + "*g=" +  Integer.toString(green) + "*b=" +  Integer.toString(blue) +"*";
-                publish(mensagem);
+
+                    String mensagem = "#r=" + Integer.toString(red) + "*g=" + Integer.toString(green) + "*b=" + Integer.toString(blue) + "*";
+                    ajudanteMqtt.publish(mensagem);
 
             }
         }));
 
 
-    }
-
-
-    public void publish(String mensagem){
-
-        String topic = "test";
-        String message = mensagem;
-        try {
-            client.publish(topic, message.getBytes(), 0, false);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
     }
 
 

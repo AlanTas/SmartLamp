@@ -29,7 +29,7 @@ dependencies {
     compile 'com.android.support:design:26.+'
     testCompile 'junit:junit:4.12'
     compile 'com.github.QuadFlask:colorpicker:0.0.13'
-    compile('org.eclipse.paho:org.eclipse.paho.android.service:1.0.2') {
-        exclude module: 'support-v4'
-    }
+    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
+    compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
+    compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
 }
