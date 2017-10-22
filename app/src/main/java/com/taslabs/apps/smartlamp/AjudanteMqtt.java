@@ -1,6 +1,10 @@
 package com.taslabs.apps.smartlamp;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -19,18 +23,25 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 
 public class AjudanteMqtt {
 
+   TextView upper;
+   TextView downer;
+
     static String MQTTHOST = "tcp://192.168.0.4:1883";  // IP e porta do servidor MQTT
     MqttAndroidClient client; // Instancia de um cliente MQTT
     String clientId = MqttClient.generateClientId(); // Gera um ID aleatório pro dispositivo
     Context context; // Contexto da classe Main
 
-    public AjudanteMqtt(Context contex){  // Construtor que recebe o contexto
+    public AjudanteMqtt(Context contex, TextView up, TextView down){  // Construtor que recebe o contexto
 
         context = contex; // Armazena a referência do contexto
+        upper = up;
+        downer = down;
     }
 
 
     public void connect(){
+        downer.setText("Conectando...");
+        downer.setTextColor(ContextCompat.getColor(context, R.color.red));
 
         client =
                 new MqttAndroidClient(context, MQTTHOST, clientId); // Configura o cliente com o contexto, endereço do servidor
@@ -43,17 +54,26 @@ public class AjudanteMqtt {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) { // Se a conexão for bem sucedida
                     // We are connected
-                    Toast toas = Toast.makeText(context, "Conectado", Toast.LENGTH_SHORT); // Exibe um Toast informando
-                    toas.show();;
+                    upper.setText("CONECTADO (" + MQTTHOST + ")");
+                    upper.setTextColor(ContextCompat.getColor(context, R.color.green));
+                    downer.setText("");
+                    //Toast toas = Toast.makeText(context, "Conectado", Toast.LENGTH_SHORT); // Exibe um Toast informando
+                    //toas.show();;
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {  //Se não for bem sucedida
                     // Something went wrong e.g. connection timeout or firewall problems
-                    Toast toas = Toast.makeText(context, "Falha", Toast.LENGTH_SHORT);     // Exibe um Toast informando
-                    toas.show();;
+                    upper.setText("DESCONECTADO");
+                    upper.setTextColor(ContextCompat.getColor(context, R.color.red));
+                    downer.setText("Falha na conexão");
+                    downer.setTextColor(ContextCompat.getColor(context, R.color.red));
+                    //Toast toas = Toast.makeText(context, "Falha", Toast.LENGTH_SHORT);     // Exibe um Toast informando
+                    //toas.show();;
 
                 }
+                
+
             });
 
         } catch (MqttException e) {
@@ -78,8 +98,6 @@ public class AjudanteMqtt {
 
         else{
 
-            Toast toas = Toast.makeText(context, "oi", Toast.LENGTH_SHORT);  // Teste da reconexão
-            toas.show();;
             connect();
 
         }
@@ -96,6 +114,17 @@ public class AjudanteMqtt {
         }
 
         return truth;
+    }
+
+    public void disconnect() {
+
+        if (client.isConnected()) {
+            try {
+                client.disconnect();
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 

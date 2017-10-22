@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
 
     ColorPickerView pickerView;
     TextView textView;
+    TextView upp;
+    TextView downn;
 
     AjudanteMqtt ajudanteMqtt;
 
@@ -37,8 +39,11 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         pickerView = (ColorPickerView) findViewById(R.id.color_picker_view);
         textView = (TextView) findViewById(R.id.textView);
+        upp = (TextView) findViewById(R.id.textView2);
+        downn = (TextView) findViewById(R.id.textView3);
 
-        ajudanteMqtt = new AjudanteMqtt(getApplicationContext());
+
+        ajudanteMqtt = new AjudanteMqtt(getApplicationContext(), upp, downn);
         ajudanteMqtt.connect();
 
         pickerView.addOnColorSelectedListener((new OnColorSelectedListener() {
