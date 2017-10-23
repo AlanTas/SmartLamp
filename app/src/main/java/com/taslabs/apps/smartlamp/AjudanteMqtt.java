@@ -90,7 +90,7 @@ public class AjudanteMqtt {
             String topic = "test";   // Tópico em que a mensagem vai ser postada
             String message = mensagem; // Mensagem a ser postada
             try {
-                client.publish(topic, message.getBytes(), 0, false); // Mensagem sendo postada com tópico, Qos e retained ou não
+                client.publish(topic, message.getBytes(), 1, false); // Mensagem sendo postada com tópico, Qos e retained ou não
             } catch (MqttException e) {
                 e.printStackTrace();
             }
